@@ -4,5 +4,5 @@ OpenCASA is a service architecture, built upon open standards and open source so
 
 OpenCASA is being developed as part of [Penn State's Digital Stewardship Program](http://stewardship.psu.edu/).  Development on OpenCASA began as part of the prototype [CAPS project](http://stewardship.psu.edu/2011/02/caps-a-curation-platform-prototype.html). Code is freely available via [Github](http://github.com/psu-stewardship/OpenCASA).
 
-We plan to implement OpenCASA services in the [Python programming language](http://www.python.org/), leveraging [OpenSRF](http://www.open-ils.org/dokuwiki/doku.php?id=osrf-devel:user_s_guide) atop the open [XMPP standard](http://en.wikipedia.org/wiki/Extensible_Messaging_and_Presence_Protocol) as our message broker and service architecture.
+We plan to implement OpenCASA services in the [Python programming language](http://www.python.org/), leveraging either [OpenSRF](http://www.open-ils.org/dokuwiki/doku.php?id=osrf-devel:user_s_guide) atop the open [XMPP standard](http://en.wikipedia.org/wiki/Extensible_Messaging_and_Presence_Protocol) or RESTful HTTP atop AMQP queues as our message broker and service architecture.
 
