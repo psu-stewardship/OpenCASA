@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="robots" content="index,follow" />
+<title>{% block title %}Penn State University - CAPS{% endblock %}</title>
+
+<link rel="stylesheet" type="text/css" href="/site_media/css/jquery.filetree.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/site_media/css/psucaps.css" media="screen" />
+
+{% block cssfiles %}{% endblock %}
+
+<style type="text/css">
+.ui-autocomplete {
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 20px;
+    background: #eee;
+    width: 15%;
+}
+.ui-autocomplete li {
+    type-display: none;
+    padding: 0 3px 0 0px;
+    margin: 0 0 0 7px;
+}
+.ui-autocomplete li a {
+    color: #244168;
+}
+.ui-autocomplete li a:hover {
+    color: #2761ad;
+}
+{% block cssinline %}
+{% endblock %}
+</style>
+
+<script type="text/javascript" src="/site_media/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery-ui-1.8.9.custom.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery.filetree.js"></script>
+<script type="text/javascript" src="/site_media/js/cufon-1.09i.js"></script>
+<script type="text/javascript" src="/site_media/js/Avenir.font.js"></script>
+<script type="text/javascript" src="/site_media/js/Aeon.font.js"></script>
+<!--[if IE 7]>
+<link rel="stylesheet" type="text/css" href="/site_media/css/ie7.css" media="screen" />
+<![endif]-->
+
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="/site_media/css/ie6.css" media="screen" />
+<![endif]-->
+
+{% block jsfiles %}{% endblock %}
+
+<script type="text/javascript" language="javascript">
+$(document).ready(function(){
+    $('#keyword.text').focus(function() {
+        if($('#keyword.text').val()=='Search'){
+            $('#keyword.text').val('');
+        };
+    });
+    $('#keyword.text').blur(function() {
+        if($('#keyword.text').val()== ''){
+            $('#keyword.text').val('Search');
+        };
+    });
+});
+Cufon.replace('#primary-menu a', {
+    fontFamily: 'Aeon',
+    hover: true
+});
+Cufon.replace('h1', {
+    fontFamily: 'Avenir'
+});
+
+$(function() {
+    // assign the autocomplete ui to the keyword 
+    // input for searching metadata
+    $("#keyword").autocomplete({
+        source: "/pilot/autocomplete/",
+        minLength: 2,
+        focus: function(event, ui) {
+            $('#keyword').val(ui.item.label);
+            return false;
+        },
+        select: function(event, ui) {
+            $('#keyword').val(ui.item.label);
+            return false;
+        }
+    })
+    .data("autocomplete")._renderItem = function(ul, item) {
+        return $("<li></li>")
+            .data("item.autocomplete", item)
+            .append("<a>" + item.label + "</a>")
+            .appendTo(ul); 
+    };
+});
+
+/*
+ * function goes and gets the matching
+ * meta data for matching keywords
+ */
+function searchMetaData(f) {
+    var search_url = "/pilot/search/" + f.keyword.value
+    $.ajax({
+        type: "GET",
+        url: search_url,
+        dataType: "html",
+        success: displayObjects
+    });
+}
+
+
+/*
+ * this function displays the objects
+ * that have been found via searching 
+ * the metadata
+ */
+function displayObjects(data) {
+    var json = $.parseJSON(data);
+
+    // no search results
+    if( json.search.matches.length == 0 ) {
+        //$('#objectListing').html("No search results for: " + json.search.keyword);
+        $('#content').html("<h1>Search Results</h1>");
+        $('#content').append("No search results for: " + json.search.keyword);
+    }
+    // search results existing
+    else {
+        $('#content').html("<h1>Search Results</h1>");
+        //$('#objectListing').html("Search results for: " + json.search.keyword +"<br />");
+        $('#content').append("Search results for: " + json.search.keyword +"<br />");
+        var o = json.search.matches;
+        var str = "";
+        var re = new RegExp("(" + json.search.keyword + ")");
+        str += "<table id=\"list-view\"><tr><th>&nbsp;</th><th>Name</th><th>ID</th><th>Metadata</th><th>Last Updated</th><th>Actions</th></tr>";
+        // loop over unique objects that matched search
+        for (var i=0; i < o.length; i++) {
+            
+            str += "<tr><td><img src=\"/site_media/img/site_images/" + o[i].img + "_48.png\" alt=\"" + o[i].alt + "\" title=\"" + o[i].alt + "\"/></td>";
+            str += "<td><a href=\"/pilot/"+ o[i].ark + "\">"+ o[i].title +"</a></td><td>" + o[i].ark + "</td><td>";
+            // loop over metadata for matched object
+            for (var j=0; j < o[i].metadata.length; j++) {
+                str += o[i].metadata[j].triple_predicate + "=>";
+                if( re.test(o[i].metadata[j].triple_object) ) {
+                    str += o[i].metadata[j].triple_object.replace(re, "<span style=\"color:red\">$1</span>");
+                }
+                str += "<br />";
+            }
+            str += "</td><td>"+ o[i].version_date+"</td>";
+            str += "<td class=\"fileactions\"><a href=\"/\"><img src=\"/site_media/img/site_images/icon_download.png\" alt=\"download\" title=\"download\"/></a><a href=\"/\"><img src=\"/site_media/img/site_images/icon_edit.png\" alt=\"edit\" title=\"edit\" /></a><a href=\"/\"><img src=\"/site_media/img/site_images/icon_delete.png\" alt=\"delete\" title=\"delete\"/></a></td></tr>";
+        }
+        str += "</table>";
+        //$('#objectListing').append(str);
+        //$('#objectListing').html(str);
+        $('#content').append(str);
+    } // close - else there are search results
+}
+{% block jscode %}{% endblock %}
+
+</script>
+
+</head>
+<body>
+            {% block menu %}
+            {% endblock %}
+    <div id="container">
+        <div id="masthead">
+            <a id="mark" href="http://www.psu.edu"><img src="/site_media/img/site_images/psu_mark.png" alt="Penn State" /></a>
+            <img class="sitetitle" src="/site_media/img/site_images/caps.png" alt="CAPS" />
+            <div id="menu-search">
+                <ul id="primary-menu">
+                    <li><a href="/">About the Project</a></li>
+                    <li><a href="/">Support</a></li>
+                    <li><a href="/">FAQ</a></li>
+                </ul>
+<form onsubmit="searchMetaData(this); return false;" style="padding: 0; margin: 0; display:inline;" id="search" name="search">
+                    <input type="text" class="text" name="keyword" id="keyword" value="Search" /> 
+                    <input type="submit" name="searchsubmit" id="searchsubmit" value="Submit Search" />
+</form>
+            </div><!-- /menu-search -->
+            <ul id="secondary-menu">
+                {% block nav %} {% endblock %}
+            </ul><!-- /secondary-menu -->
+            <div id="mystats">
+                <span class="statshead">My Upload Stats:</span>
+                <span class="statscontent">&raquo; Objects: <span class="qty">{% block total_objects %}{% endblock %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&raquo; Files: <span class="qty">{% block total_files %}{% endblock %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&raquo; Total Size: <span class="qty">{% block total_size %}{% endblock %}</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="##">Logout</a></span>
+            </div>
+        </div><!-- /masthead -->
+
+<div id="content">
+{% block content %}{% endblock %}
+
+</div><!-- close #content -->
+
+    </div><!-- /container -->
+    <div id="footer">
+        <div id="footer-inner">
+            <p>Copyright &copy;2011 The Pennsylvania State University</p>
+        </div><!-- /footer-inner -->
+    </div><!-- /footer -->
+
+</body>
+</html>

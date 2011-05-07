@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+#   author: dmc186
+#   date: 01-19-2011
+#   file: reset_app
+#   purpose: this file will reset 
+#   the pilot application so we are starting
+#   fresh.  
+#   -Removes the rdf storage 
+#   -Removes the actual files 
+#   -Empties the database
+#   -Empties tmp dir
+#   THIS IS NOT REVERSIBLE
+#
+
+RDF_CACHE=/var/www/django/caps/rdfstore/*
+RDF_STORE=/var/data/rdfstore.bdb/*
+PAIR_STORE=/tmp/OpenCASA-repo/pairtree_root/*
+TMP_FILES=/tmp/tmp*
+rm -rf $RDF_CACHE
+rm -rf $RDF_STORE
+rm -rf $PAIR_STORE
+rm -rf $TMP_FILES
+python ../manage.py reset pilot --noinput

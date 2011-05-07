@@ -1,0 +1,12 @@
+#*
+*#
+.#*
+*~
+*.swp
+*.log
+*.pyc
+*.sqlite
+local_settings.py
+rdfstore
+scriptdocs
+

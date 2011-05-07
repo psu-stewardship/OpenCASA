@@ -6,3 +6,8 @@ OpenCASA is being developed as part of [Penn State's Digital Stewardship Program
 
 We plan to implement OpenCASA services in the [Python programming language](http://www.python.org/), leveraging either [OpenSRF](http://www.open-ils.org/dokuwiki/doku.php?id=osrf-devel:user_s_guide) atop the open [XMPP standard](http://en.wikipedia.org/wiki/Extensible_Messaging_and_Presence_Protocol) or RESTful HTTP atop AMQP queues as our message broker and service architecture.
 
+Contents
+========
+
+This repository contains config files and code for a service architecture where nginx acts as a reverse proxy, or broker, for numerous service instances. Services are Python code run in a RESTful HTTP container.  The CAPS application is included as an example of an application that calls the service broker.  Example services are storage, identity, and annotate.
+
