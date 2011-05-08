@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'services.identity',
+    'tastypie',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -144,6 +145,9 @@ LOGGING = {
         },
     }
 }
+
+NAME_AUTHORITY = '42409'
+TEMPLATE = 'eeddeeddk'
 
 try:
     from local_settings import *
